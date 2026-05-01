@@ -21,12 +21,48 @@
         <td th:text="${emp.id}"></td>
         <td th:text="${emp.name}"></td>
         <td th:text="${emp.age}"></td>
-        <td th:text="${emp.avatar}"></td>
+
+        <td>
+            <img th:src="${emp.avatar != null}
+                ? @{/uploads/{img}(img=${emp.avatar})}
+                : @{/images/default.png}"
+                 width="80" height="80"/>
+        </td>
+
         <td th:text="${emp.status}"></td>
         <td th:text="${emp.department.name}"></td>
     </tr>
-
 </table>
+
+<h2>Thêm nhân viên</h2>
+
+<form th:action="@{/employees/save}"
+      th:object="${employee}"
+      method="post"
+      enctype="multipart/form-data">
+
+    <input type="text" th:field="*{name}" placeholder="Name"/>
+
+    <input type="number" th:field="*{age}" placeholder="Age"/>
+
+    <select th:field="*{department.id}">
+        <option value="">-- Chọn phòng ban --</option>
+        <option th:each="dept : ${departments}"
+                th:value="${dept.id}"
+                th:text="${dept.name}">
+        </option>
+    </select>
+
+    <input type="file" name="file"/>
+
+    <select th:field="*{status}">
+        <option value="ACTIVE">ACTIVE</option>
+        <option value="INACTIVE">INACTIVE</option>
+    </select>
+
+    <button type="submit">Save</button>
+
+</form>
 
 </body>
 </html>

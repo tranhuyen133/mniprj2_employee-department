@@ -7,16 +7,37 @@
 
 <h1>Danh sách nhân viên</h1>
 
+<!-- SEARCH -->
+<form method="get" th:action="@{/employees}">
+    <input type="text" name="keyword" th:value="${keyword}" placeholder="Tìm theo tên..."/>
+    <button type="submit">Search</button>
+</form>
+
 <table border="1">
+
+    <thead>
     <tr>
         <th>ID</th>
-        <th>Name</th>
-        <th>Age</th>
+
+        <th>
+            <a th:href="@{/employees(page=0, sortField='name', sortDir=${reverseSortDir}, keyword=${keyword})}">
+                Name
+            </a>
+        </th>
+
+        <th>
+            <a th:href="@{/employees(page=0, sortField='age', sortDir=${reverseSortDir}, keyword=${keyword})}">
+                Age
+            </a>
+        </th>
+
         <th>Avatar</th>
         <th>Status</th>
         <th>Department</th>
     </tr>
+    </thead>
 
+    <tbody>
     <tr th:each="emp : ${employees}">
         <td th:text="${emp.id}"></td>
         <td th:text="${emp.name}"></td>
@@ -32,8 +53,37 @@
         <td th:text="${emp.status}"></td>
         <td th:text="${emp.department.name}"></td>
     </tr>
+
+    <tr th:if="${#lists.isEmpty(employees)}">
+        <td colspan="6">Không tìm thấy nhân viên nào</td>
+    </tr>
+    </tbody>
+
 </table>
 
+<!-- PAGINATION -->
+<div style="margin-top:20px">
+
+    <a th:if="${currentPage > 0}"
+       th:href="@{/employees(page=${currentPage - 1}, sortField=${sortField}, sortDir=${sortDir}, keyword=${keyword})}">
+        Previous
+    </a>
+
+    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+        <a th:href="@{/employees(page=${i}, sortField=${sortField}, sortDir=${sortDir}, keyword=${keyword})}"
+           th:text="${i + 1}"
+           th:style="${i == currentPage} ? 'font-weight:bold;color:red' : ''">
+        </a>
+    </span>
+
+    <a th:if="${currentPage < totalPages - 1}"
+       th:href="@{/employees(page=${currentPage + 1}, sortField=${sortField}, sortDir=${sortDir}, keyword=${keyword})}">
+        Next
+    </a>
+
+</div>
+
+<!-- FORM CREATE -->
 <h2>Thêm nhân viên</h2>
 
 <form th:action="@{/employees/save}"
@@ -42,7 +92,6 @@
       enctype="multipart/form-data">
 
     <input type="text" th:field="*{name}" placeholder="Name"/>
-
     <input type="number" th:field="*{age}" placeholder="Age"/>
 
     <select th:field="*{department.id}">
